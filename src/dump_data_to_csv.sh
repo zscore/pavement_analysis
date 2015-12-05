@@ -7,6 +7,7 @@ mkdir -p $CSV_DIR
 
 # Gets the database URL for dumping out csv.
 cd $SRC_DIR/../../webapp
+#this is not going to work unless you are added as an admin to the Heroku webapp!
 export PP_DB_URL=`heroku config:get DATABASE_URL -a project-pavement`
 
 #dumps data into two csvs
