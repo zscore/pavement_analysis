@@ -78,6 +78,8 @@ def clean_readings(readings):
                                      readings['start_lat'],
                                      readings['end_lon'],
                                      readings['end_lat'])
+    readings['gps_speed'] = readings['gps_dist'] / (readings['end_time'] - readings['start_time'])
+    readings['total_readings'] = readings['num_accel_x'].apply(lambda x: len(x))
     return readings
 
 def pull_data_from_heroku():

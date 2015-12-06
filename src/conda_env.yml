@@ -21,7 +21,7 @@ blz=0.6.2=np19py27_1
 bokeh=0.10.0=py27_0
 boto=2.38.0=py27_0
 bottleneck=1.0.0=np110py27_0
-cairo=1.12.18=5
+cairo=1.12.18=6
 casuarius=1.1=py27_0
 cdecimal=2.3=py27_0
 certifi=14.05.14=py27_0
@@ -35,6 +35,7 @@ conda-env=2.4.4=py27_0
 configobj=5.0.6=py27_0
 cryptography=1.0.2=py27_0
 curl=7.45.0=0
+cycler=0.9.0=py27_0
 cython=0.23.4=py27_0
 cytoolz=0.7.4=py27_0
 datashape=0.4.7=np110py27_1
@@ -92,7 +93,7 @@ llvmlite=0.7.0=py27_3
 llvmpy=0.12.7=py27_0
 lxml=3.4.4=py27_0
 markupsafe=0.23=py27_0
-matplotlib=1.4.3=np110py27_2
+matplotlib=1.5.0=np110py27_0
 mistune=0.7.1=py27_0
 mock=1.0.1=py27_0
 mpi4py=1.3=py27_0
@@ -111,7 +112,7 @@ odo=0.3.4=py27_0
 openblas=0.2.14=3
 openpyxl=2.2.6=py27_0
 openssl=1.0.2d=0
-pandas=0.17.0=np110py27_0
+pandas=0.17.1=np110py27_0
 patchelf=0.6=0
 path.py=8.1.2=py27_0
 patsy=0.4.0=np110py27_0
@@ -121,7 +122,7 @@ pickleshare=0.5=py27_0
 pil=1.1.7=py27_1
 pillow=3.0.0=py27_1
 pip=7.1.2=py27_0
-pixman=0.26.2=0
+pixman=0.32.6=0
 ply=3.8=py27_0
 proj.4=4.9.1=0
 psutil=3.2.2=py27_0
@@ -139,12 +140,12 @@ pygments=2.0.2=py27_0
 pyopenssl=0.15.1=py27_1
 pyparsing=2.0.3=py27_0
 pyproj=1.9.4=py27_1
-pyqt=4.11.4=py27_0
+pyqt=4.11.4=py27_1
 pytables=3.2.2=np110py27_0
 pytest=2.8.1=py27_0
 python=2.7.10=2
 python-dateutil=2.4.2=py27_0
-pytz=2015.6=py27_0
+pytz=2015.7=py27_0
 pyyaml=3.11=py27_1
 pyzmq=14.7.0=py27_1
 qt=4.8.7=1
@@ -158,6 +159,7 @@ runipy=0.1.3=py27_0
 scikit-image=0.11.3=np110py27_0
 scikit-learn=0.16.1=np110py27_0
 scipy=0.16.0=np110py27_1
+seaborn=0.6.0=np110py27_0
 setuptools=18.5=py27_0
 shapely=1.5.11=py27_0
 simplegeneric=0.8.1=py27_0
