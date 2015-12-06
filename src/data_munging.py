@@ -4,6 +4,7 @@ import os
 import pandas as pd
 import pyproj
 import requests
+import rtree
 import subprocess
 
 src_dir = os.path.dirname(os.path.abspath(__file__)) + '/'
@@ -32,7 +33,9 @@ nyc_bounding_box = {'upper_lat': 41.340,
                         'left_lon': -74.713,
                         'right_lon': -71.570}
 
-# def calc_dist(lons1, lats1, lons2, lats2):
+def add_routes_to_shapely():
+    "nothing"
+
 def calc_dist(*args):
     """I have no idea if Clark ='s ellipsoid is good for our purposes or not."""
     if len(args[0]) > 0:
