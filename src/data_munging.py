@@ -47,7 +47,6 @@ def filter_readings_to_chicago(readings):
 def filter_readings_to_nyc(readings):
     return filter_readings_by_bb(readings, nyc_bounding_box)
 
-
 def add_routes_to_shapely():
     "nothing"
 
@@ -92,6 +91,7 @@ def clean_readings(readings):
     for axis in ['x', 'y', 'z']:
         readings['num_accel_' + axis] = readings['acceleration_' + axis].apply(_string_to_array)
         readings['std_' + axis] = readings['num_accel_' + axis].apply(np.std)
+    readings['std_total'] = (readings['std_x'] ** 2 + readings['std_y'] ** 2 + readings['std_z'] ** 2) ** 0.5
     readings['gps_dist'] = calc_dist(readings['start_lon'],
                                      readings['start_lat'],
                                      readings['end_lon'],
@@ -110,6 +110,16 @@ def pull_data_by_time_range():
 def update_data():
     """Archives old data and pulls new data. If data grows large,
     only get the new stuff. Can organize this within folders."""
+
+def insert_readings_rtree(readings):
+    readings_idx = rtree.index.Index()
+    for index, row in readings[['start_x', 'start_y', 'end_x', 'end_y']].iterrows():
+        left = min(row.start_x, row.end_x)
+        right = max(row.start_x, row.end_x)
+        top = max(row.start_y, row.end_y)
+        bottom = min(row.start_y, row.end_y)
+        readings_idx.insert(index, (left, bottom, right, top))
+    return readings_idx
 
 if __name__ == '__main__':
     """does nothing"""
