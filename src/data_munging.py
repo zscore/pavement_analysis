@@ -33,6 +33,21 @@ nyc_bounding_box = {'upper_lat': 41.340,
                         'left_lon': -74.713,
                         'right_lon': -71.570}
 
+def filter_readings_by_bb(readings, bb):
+    """Filters readings by start lat/lon contained in bounding box."""
+    to_keep = np.logical_and(np.logical_and(readings['start_lon'] >= bb['left_lon'],
+        readings['start_lon'] <= bb['right_lon']),
+        np.logical_and(readings['start_lat'] >= bb['lower_lat'],
+            readings['start_lat'] <= bb['upper_lat']))
+    return readings.ix[to_keep, :]
+
+def filter_readings_to_chicago(readings):
+    return filter_readings_by_bb(readings, chicago_bounding_box)
+
+def filter_readings_to_nyc(readings):
+    return filter_readings_by_bb(readings, nyc_bounding_box)
+
+
 def add_routes_to_shapely():
     "nothing"
 
