@@ -118,8 +118,14 @@ def insert_readings_rtree(readings):
         right = max(row.start_x, row.end_x)
         top = max(row.start_y, row.end_y)
         bottom = min(row.start_y, row.end_y)
+        # index_obj = (index, (left, bottom, right, top))
+        # print index_obj
         readings_idx.insert(index, (left, bottom, right, top))
     return readings_idx
+
+def expand_bb(bb, exp_amt):
+    return [bb[0] - exp_amt, bb[1] - exp_amt,
+            bb[2] + exp_amt, bb[3] + exp_amt]
 
 if __name__ == '__main__':
     """does nothing"""
