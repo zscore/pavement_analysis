@@ -33,6 +33,12 @@ nyc_bounding_box = {'upper_lat': 41.340,
                         'left_lon': -74.713,
                         'right_lon': -71.570}
 
+kimball_bounding_box = {'upper_lat': 41.95,
+                        'lower_lat': 41.90,
+                        'left_lon': -87.75,
+                        'right_lon': -87.70}
+
+
 def filter_readings_by_bb(readings, bb):
     """Filters readings by start lat/lon contained in bounding box."""
     to_keep = np.logical_and(np.logical_and(readings['start_lon'] >= bb['left_lon'],
@@ -85,17 +91,27 @@ def add_proj_to_readings(readings, proj):
     end_xy.columns = ('end_x', 'end_y')
     readings = readings.join(start_xy)
     readings = readings.join(end_xy)
+    readings['bb'] = readings.apply(reading_to_bb, axis=1)
     return readings
+
+to_total_mag = lambda x: [np.array([(x['num_accel_x'][i] ** 2 +
+                                   x['num_accel_y'][i] ** 2 +
+                                   x['num_accel_z'][i] ** 2) ** 0.5
+                                   for i in range(len(x['num_accel_x']))])]
 
 def clean_readings(readings):
     for axis in ['x', 'y', 'z']:
         readings['num_accel_' + axis] = readings['acceleration_' + axis].apply(_string_to_array)
+        readings['abs_sum_' + axis] = readings['num_accel_' + axis].apply(lambda x: np.sum(np.abs(x)))
         readings['std_' + axis] = readings['num_accel_' + axis].apply(np.std)
     readings['std_total'] = (readings['std_x'] ** 2 + readings['std_y'] ** 2 + readings['std_z'] ** 2) ** 0.5
     readings['gps_dist'] = calc_dist(readings['start_lon'],
                                      readings['start_lat'],
                                      readings['end_lon'],
                                      readings['end_lat'])
+    readings['num_accel_total'] = readings.apply(to_total_mag, axis=1)
+    readings['num_accel_total'] = readings['num_accel_total'].apply(lambda x: x[0])
+    readings['abs_sum_total'] = readings['num_accel_total'].apply(sum)
     readings['gps_speed'] = readings['gps_dist'] / (readings['end_time'] - readings['start_time'])
     readings['total_readings'] = readings['num_accel_x'].apply(lambda x: len(x))
     return readings
@@ -111,21 +127,36 @@ def update_data():
     """Archives old data and pulls new data. If data grows large,
     only get the new stuff. Can organize this within folders."""
 
+def reading_to_bb(row):
+    left = min(row.start_x, row.end_x)
+    right = max(row.start_x, row.end_x)
+    bottom = min(row.start_y, row.end_y)
+    top = max(row.start_y, row.end_y)
+    return((left, bottom, right, top))
+
 def insert_readings_rtree(readings):
     readings_idx = rtree.index.Index()
-    for index, row in readings[['start_x', 'start_y', 'end_x', 'end_y']].iterrows():
-        left = min(row.start_x, row.end_x)
-        right = max(row.start_x, row.end_x)
-        top = max(row.start_y, row.end_y)
-        bottom = min(row.start_y, row.end_y)
-        # index_obj = (index, (left, bottom, right, top))
-        # print index_obj
-        readings_idx.insert(index, (left, bottom, right, top))
+    for index, bb in readings['bb'].iteritems():
+        readings_idx.insert(index, bb)
     return readings_idx
 
 def expand_bb(bb, exp_amt):
     return [bb[0] - exp_amt, bb[1] - exp_amt,
             bb[2] + exp_amt, bb[3] + exp_amt]
+
+def calc_reading_diffs(reading0, reading1):
+    start0 = reading0[['start_x', 'start_y']].values
+    start1 = reading1[['start_x', 'start_y']].values
+    end0 = reading0[['end_x', 'end_y']].values
+    end1 = reading1[['end_x', 'end_y']].values
+    diff0 = np.linalg.norm(start0 - start1) + np.linalg.norm(end0 - end1)
+    diff1 = np.linalg.norm(start0 - end1) + np.linalg.norm(end0 - start1)
+    diff = min(diff0, diff1)
+    dist0 = np.linalg.norm(start0 - end0)
+    dist1 = np.linalg.norm(start1 - end1)
+    if dist0 == 0 or dist1 == 0:
+        return np.inf
+    return diff / (dist0 + dist1)
 
 if __name__ == '__main__':
     """does nothing"""
