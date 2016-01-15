@@ -140,6 +140,10 @@ def insert_readings_rtree(readings):
         readings_idx.insert(index, bb)
     return readings_idx
 
+def point_to_bb(x, y, side_length):
+    return [x - side_length / 2., y - side_length / 2.,
+            x + side_length / 2, y + side_length / 2.]
+
 def expand_bb(bb, exp_amt):
     return [bb[0] - exp_amt, bb[1] - exp_amt,
             bb[2] + exp_amt, bb[3] + exp_amt]
@@ -157,6 +161,19 @@ def calc_reading_diffs(reading0, reading1):
     if dist0 == 0 or dist1 == 0:
         return np.inf
     return diff / (dist0 + dist1)
+
+def select_random_point(readings):
+    """ Selects a random reading and samples a point from
+    the segment as uniform(0,1) linearly interpolating from start
+    to end.
+    """
+    an_idx = np.random.choice(readings.index, 1)
+    place_on_route = np.random.uniform()
+    return (an_idx,
+           (float(place_on_route * readings['start_x'][an_idx]  +
+             (1 - place_on_route) * readings['end_x'][an_idx]),
+           float(place_on_route * readings['start_y'][an_idx]  +
+            (1 - place_on_route) * readings['end_y'][an_idx])))
 
 if __name__ == '__main__':
     """does nothing"""
