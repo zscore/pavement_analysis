@@ -91,7 +91,6 @@ def add_proj_to_readings(readings, proj):
     end_xy.columns = ('end_x', 'end_y')
     readings = readings.join(start_xy)
     readings = readings.join(end_xy)
-    readings['bb'] = readings.apply(reading_to_bb, axis=1)
     return readings
 
 to_total_mag = lambda x: [np.array([(x['num_accel_x'][i] ** 2 +
@@ -105,6 +104,7 @@ def clean_readings(readings):
         readings['abs_sum_' + axis] = readings['num_accel_' + axis].apply(lambda x: np.sum(np.abs(x)))
         readings['std_' + axis] = readings['num_accel_' + axis].apply(np.std)
     readings['std_total'] = (readings['std_x'] ** 2 + readings['std_y'] ** 2 + readings['std_z'] ** 2) ** 0.5
+    readings['duration'] = readings['end_time'] - readings['start_time']
     readings['gps_dist'] = calc_dist(readings['start_lon'],
                                      readings['start_lat'],
                                      readings['end_lon'],
@@ -112,8 +112,10 @@ def clean_readings(readings):
     readings['num_accel_total'] = readings.apply(to_total_mag, axis=1)
     readings['num_accel_total'] = readings['num_accel_total'].apply(lambda x: x[0])
     readings['abs_sum_total'] = readings['num_accel_total'].apply(sum)
-    readings['gps_speed'] = readings['gps_dist'] / (readings['end_time'] - readings['start_time'])
+    readings['gps_speed'] = readings['gps_dist'] / readings['duration']
     readings['total_readings'] = readings['num_accel_x'].apply(lambda x: len(x))
+    readings['start_datetime'] = readings['start_time'].apply(pd.datetime.fromtimestamp)
+    readings['end_datetime'] = readings['end_time'].apply(pd.datetime.fromtimestamp)
     return readings
 
 def pull_data_from_heroku():
@@ -132,7 +134,7 @@ def reading_to_bb(row):
     right = max(row.start_x, row.end_x)
     bottom = min(row.start_y, row.end_y)
     top = max(row.start_y, row.end_y)
-    return((left, bottom, right, top))
+    return (left, bottom, right, top)
 
 def insert_readings_rtree(readings):
     readings_idx = rtree.index.Index()
