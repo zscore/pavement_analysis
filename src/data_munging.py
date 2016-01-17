@@ -101,7 +101,7 @@ to_total_mag = lambda x: [np.array([(x['num_accel_x'][i] ** 2 +
 def clean_readings(readings):
     for axis in ['x', 'y', 'z']:
         readings['num_accel_' + axis] = readings['acceleration_' + axis].apply(_string_to_array)
-        readings['abs_sum_' + axis] = readings['num_accel_' + axis].apply(lambda x: np.sum(np.abs(x)))
+        readings['abs_mean_' + axis] = readings['num_accel_' + axis].apply(lambda x: np.mean(np.abs(x)))
         readings['std_' + axis] = readings['num_accel_' + axis].apply(np.std)
     readings['std_total'] = (readings['std_x'] ** 2 + readings['std_y'] ** 2 + readings['std_z'] ** 2) ** 0.5
     readings['duration'] = readings['end_time'] - readings['start_time']
@@ -111,7 +111,7 @@ def clean_readings(readings):
                                      readings['end_lat'])
     readings['num_accel_total'] = readings.apply(to_total_mag, axis=1)
     readings['num_accel_total'] = readings['num_accel_total'].apply(lambda x: x[0])
-    readings['abs_sum_total'] = readings['num_accel_total'].apply(sum)
+    readings['abs_mean_total'] = readings['num_accel_total'].apply(np.mean)
     readings['gps_speed'] = readings['gps_dist'] / readings['duration']
     readings['total_readings'] = readings['num_accel_x'].apply(lambda x: len(x))
     readings['start_datetime'] = readings['start_time'].apply(pd.datetime.fromtimestamp)
@@ -138,8 +138,8 @@ def reading_to_bb(row):
 
 def insert_readings_rtree(readings):
     readings_idx = rtree.index.Index()
-    for index, bb in readings['bb'].iteritems():
-        readings_idx.insert(index, bb)
+    for index, reading in readings.iterrows():
+        readings_idx.insert(index, reading_to_bb(reading))
     return readings_idx
 
 def point_to_bb(x, y, side_length):
