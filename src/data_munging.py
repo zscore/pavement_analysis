@@ -56,10 +56,23 @@ def filter_readings_to_nyc(readings):
 def add_routes_to_shapely():
     "nothing"
 
+def filter_to_good_readings(readings):
+    return readings.loc[get_good_readings(readings), :]
+
+def get_good_readings(readings):
+    return np.logical_and.reduce((readings['gps_mph'] < 30,
+                                   readings['gps_mph'] > 4,
+                                   readings['total_readings'] > 90,
+                                   readings['total_readings'] < 110))
+
 def calc_dist(*args):
-    """I have no idea if Clark ='s ellipsoid is good for our purposes or not."""
-    if len(args[0]) > 0:
+    """I have no idea if Clark ='s ellipsoid is good for our purposes or not.
+    Accepts calc_dist(lon, lat, lon, lat) where they may be iterables or
+    single values."""
+    try:
         args = [list(arg) for arg in args]
+    except:
+        'nothing'
     clark_geod = pyproj.Geod(ellps='clrk66')
     az12, az21, dist = clark_geod.inv(*args)
     return dist
@@ -113,9 +126,11 @@ def clean_readings(readings):
     readings['num_accel_total'] = readings['num_accel_total'].apply(lambda x: x[0])
     readings['abs_mean_total'] = readings['num_accel_total'].apply(np.mean)
     readings['gps_speed'] = readings['gps_dist'] / readings['duration']
+    readings['gps_mph'] = readings['gps_speed'] * 2.23694
     readings['total_readings'] = readings['num_accel_x'].apply(lambda x: len(x))
     readings['start_datetime'] = readings['start_time'].apply(pd.datetime.fromtimestamp)
     readings['end_datetime'] = readings['end_time'].apply(pd.datetime.fromtimestamp)
+    readings['abs_mean_over_speed'] = readings['abs_mean_total'] / readings['gps_speed']
     return readings
 
 def pull_data_from_heroku():
