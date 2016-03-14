@@ -144,12 +144,23 @@ def update_data():
     """Archives old data and pulls new data. If data grows large,
     only get the new stuff. Can organize this within folders."""
 
+def coords_to_bb(coord0, coord1):
+    left = min(coord0[0], coord[0])
+    right = max(coord0[0], coord1[0])
+    bottom = min(coord0[1], coord1[1])
+    top = max(coord0[1], coord1[1])
+    return (left, bottom, right, top)
+
 def reading_to_bb(row):
     left = min(row.start_x, row.end_x)
     right = max(row.start_x, row.end_x)
     bottom = min(row.start_y, row.end_y)
     top = max(row.start_y, row.end_y)
     return (left, bottom, right, top)
+
+def area_of_bb(bb):
+    left, bottom, right, top = bb
+    return (abs(left - right) * abs(top - bottom))
 
 def insert_readings_rtree(readings):
     readings_idx = rtree.index.Index()
