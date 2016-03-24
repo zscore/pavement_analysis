@@ -145,7 +145,7 @@ def update_data():
     only get the new stuff. Can organize this within folders."""
 
 def coords_to_bb(coord0, coord1):
-    left = min(coord0[0], coord[0])
+    left = min(coord0[0], coord1[0])
     right = max(coord0[0], coord1[0])
     bottom = min(coord0[1], coord1[1])
     top = max(coord0[1], coord1[1])
