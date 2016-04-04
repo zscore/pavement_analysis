@@ -28,6 +28,8 @@ RUN apt-get install -y build-essential protobuf-compiler libprotobuf-dev
 
 RUN pip install imposm.parser
 
+RUN pip install folium
+
 # http://bugs.python.org/issue19846
 # > At the moment, setting "LANG=C" on a Linux system *fundamentally breaks Python 3*, and that's not OK.
 ENV LANG C.UTF-8
