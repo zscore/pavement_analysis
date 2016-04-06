@@ -30,6 +30,10 @@ RUN pip install imposm.parser
 
 RUN pip install folium
 
+RUN git clone https://github.com/damianavila/RISE.git
+
+RUN python RISE/setup.py install
+
 # http://bugs.python.org/issue19846
 # > At the moment, setting "LANG=C" on a Linux system *fundamentally breaks Python 3*, and that's not OK.
 ENV LANG C.UTF-8
